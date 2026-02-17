@@ -12,7 +12,7 @@
 
       <div text="center" select-none>
         <p>该网站使用 Analytics, 这是为了帮助我们提供更好的用户体验, 给用户带来福祉.</p>
-        <p>我们使用的 Analytics 服务提供商: Google Analytics, Microsoft Clarity 以及 Cloudflare Web Analytics.</p>
+        <p>我们使用的 Analytics 服务提供商: <a underline target="_blank" href="https://www.google.com/analytics/terms/">Google Analytics</a>, <a underline target="_blank" href="https://clarity.microsoft.com/terms">Microsoft Clarity</a> 以及 <a underline target="_blank" href="https://www.cloudflare.com/website-terms/">Cloudflare Web Analytics</a>.</p>
         <p c-red m-t-1.7>若您点击了 "接受并同意 Analytics", 这也意味着您已仔细阅读并均已接受和同意上述 Analytics 服务提供商的相关隐私政策和用户协议.</p>
         <div m-t-4 justify-center flex gap-2>
           <Button label="数据管理" title="转到数据管理页面" icon="pi pi-database" severity="secondary"
