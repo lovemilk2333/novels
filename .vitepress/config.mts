@@ -51,8 +51,8 @@ export default defineConfig({
   },
   vite: {
     server: {
-      host: "localhost",
-      port: 8080
+      host: "0.0.0.0",
+      port: 5123
     },
     plugins: [  // @ts-ignore
       AutoSidebar({

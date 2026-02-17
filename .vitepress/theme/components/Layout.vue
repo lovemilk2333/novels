@@ -1,17 +1,26 @@
 <script setup lang="ts">
 // @ts-ignore
 const isDev: boolean = !!import.meta.env.DEV;
-let loc
+
+const closeAll = (afterRemoveBody?: () => void) => {
+  document.body.innerHTML = ''
+  if (!!afterRemoveBody) {
+    afterRemoveBody()
+  }
+  location.replace('about:blank')
+  window.close()
+}
+
+let loc: string | undefined
 (async () => {
-  const domains = [
-    'cf.novels.lovemilk.top',
-    'cf.notes.lovemilk.top',
+  const domains: string[] = [
+    'novels.lovemilk.top',
+    'notes.lovemilk.top',
+    'www.cloudflare-cn.com',
   ]
 
-  const closeAll = () => {
-    document.body.innerHTML = ''
-    location.assign('about:blank')
-    window.close()
+  const alertClose = () => {
+    alert('Critical Error: invalid region state!!!')
   }
 
   let res
@@ -19,11 +28,11 @@ let loc
     try {
       res = await (await fetch(`https://${domain}/cdn-cgi/trace`)).text()
       break
-    } catch {}
+    } catch { }
   }
 
   if (!res || typeof res !== 'string') {
-    closeAll()
+    closeAll(alertClose)
     return
   }
 
@@ -31,18 +40,20 @@ let loc
   const loc = locMatched ? locMatched[1] : null;
 
   if (!loc || typeof loc !== 'string') {
-    closeAll()
+    closeAll(alertClose)
     return
   }
 
   if (loc === 'T1') {
-    closeAll()
+    closeAll(alertClose)
     return
   }
 
   return loc
 })().then((data) => {
   loc = data
+}).finally(() => {
+  checkRegion()
 })
 
 import { computed, VNode, h } from 'vue';
@@ -97,7 +108,7 @@ const checkRegion = () => {
       '尊敬的用户, 我们注意到您正在从中国大陆访问本网站', h('br'),
       '这可能会违反您所在国家与地区的法律法规, 须由您承担一切后果', h('br'),
       '如有需要, 您可以访问 `', h('a', { href: '/_/DataManage', class: 'underline' }, '数据管理页面'), ' > 区域检查` 以设置本弹窗永不弹出'
-    ], ),
+    ],),
     icon: 'pi pi-exclamation-triangle',
     acceptProps: {
       icon: 'pi pi-check',
@@ -114,8 +125,7 @@ const checkRegion = () => {
     position: 'center',
     blockScroll: true,
     accept() {
-      location.assign('about:blank')
-      window.close()
+      closeAll()
     },
     reject() {
       // store.ignoreUnsupportedRegion = true
@@ -142,6 +152,7 @@ provide('toggle-appearance', async ({ clientX: x, clientY: y }: MouseEvent) => {
     )}px at ${x}px ${y}px)`,
   ]
 
+  // @ts-ignore
   await document.startViewTransition(async () => {
     isDark.value = !isDark.value
     await nextTick()
@@ -157,7 +168,7 @@ provide('toggle-appearance', async ({ clientX: x, clientY: y }: MouseEvent) => {
   )
 })
 
-checkRegion()
+// checkRegion()
 </script>
 
 <template>
@@ -167,7 +178,7 @@ checkRegion()
       <span v-if="!!slotProps.message.icon" :class="slotProps.message.icon" class="!text-6xl text-primary-500" />
       <p v-if="!!slotProps.message.message">{{ slotProps.message.message }}</p>
       <component v-if="!!slotProps.message.content" :is="slotProps.message.content" />
-      </template>
+    </template>
   </ConfirmDialog>
   <Analytics v-if="!isNotFound && !isHome && !isInternal" />
   <ClientOnly>
