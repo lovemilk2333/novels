@@ -33,5 +33,6 @@
     "taze": "^0.18.0",
     "unocss": "^0.64.1",
     "vite": "5.4.11"
-  }
+  },
+  "packageManager": "pnpm@10.29.3"
 }
