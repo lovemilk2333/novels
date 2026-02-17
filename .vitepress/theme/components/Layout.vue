@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { useRegionCheckStore } from '../../../stores/regionCheck'
+
 // @ts-ignore
 const isDev: boolean = !!import.meta.env.DEV;
+const store = useRegionCheckStore()
 
 const closeAll = (afterRemoveBody?: () => void) => {
   document.body.innerHTML = ''
@@ -14,7 +17,7 @@ const closeAll = (afterRemoveBody?: () => void) => {
 let loc: string | undefined
 (async () => {
   const domains: string[] = [
-    'novels.lovemilk.top',
+    'cf.novels.lovemilk.top',
     'notes.lovemilk.top',
     'www.cloudflare-cn.com',
   ]
@@ -23,25 +26,37 @@ let loc: string | undefined
     alert('Critical Error: invalid region state!!!')
   }
 
+  const getLoc = (res: string): string | undefined => {
+    if (!res || typeof res !== 'string') {
+      // closeAll(alertClose)
+      return 
+    }
+
+    const locMatched = res.match(/loc=([0-9A-Z]{2})/)
+    const loc = locMatched ? locMatched[1] : null;
+
+    if (!loc || typeof loc !== 'string') {
+      // closeAll(alertClose)
+      return
+    }
+
+    return loc
+  }
+
   let res
   for (const domain of domains) {
     try {
       res = await (await fetch(`https://${domain}/cdn-cgi/trace`)).text()
-      break
+      const _loc = getLoc(res)
+      if (!!_loc && !!_loc.length) {
+        loc = _loc
+        break
+      }
     } catch { }
   }
 
-  if (!res || typeof res !== 'string') {
+  if (!loc || !loc.length) {
     closeAll(alertClose)
-    return
-  }
-
-  const locMatched = res.match(/loc=([0-9A-Z]{2})/)
-  const loc = locMatched ? locMatched[1] : null;
-
-  if (!loc || typeof loc !== 'string') {
-    closeAll(alertClose)
-    return
   }
 
   if (loc === 'T1') {
@@ -65,8 +80,6 @@ import Analytics from './Analytics.vue';
 import ConfirmDialog from 'primevue/confirmdialog';
 import { useConfirm } from "primevue/useconfirm";
 
-import { useRegionCheckStore } from '../../../stores/regionCheck'
-
 const { Layout } = DefaultTheme
 
 const confirm = useConfirm();
@@ -85,9 +98,7 @@ declare module 'primevue/confirmationoptions' {
   }
 }
 
-const store = useRegionCheckStore()
-
-const checkRegion = () => {
+function checkRegion() {
   if (!!store.ignoreUnsupportedRegion) {
     return
   }
